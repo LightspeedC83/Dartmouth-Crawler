@@ -1,4 +1,4 @@
-# Webcrawler
+# Dartmouth Webcrawler
 I was bored and doing my university course selection. It got me wondering what the most needed prerequisite was, and what class needed the most prerequisites, and so on, and so forth...
 
 I am also using this as an opportunity to learn how to effectively use uv to manage my python projects

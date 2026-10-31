@@ -13,16 +13,20 @@ HEADERS = {
 
 def fetch_page(url):
     """downloads a page and returns the html content (type <class 'bytes'>). raises an error on bad lookup"""
-    response = requests.get(url) # http response object using requests library
-    response.raise_for_status() # this will raise an error if we get a bad lookup
-    
-    return response.content
+    try:
 
-def parse_internal_links(html):
-    """"""
+        response = requests.get(url) # http response object using requests library
+        response.raise_for_status() # this will raise an error if we get a bad lookup
+        return response.content
+    except requests.exceptions.HTTPError or requests.exceptions.RequestException:
+        return None
+
+
+def parse_internal_links(html, internal_link_starts_with):
+    """when given html content, this function uses beautiful soup to find all the links that are internal."""
     soup = BeautifulSoup(html, "html.parser")
 
-    return [ x["href"] for x in soup.find_all("a") if x["href"].startswith("/en")]
+    return [ x["href"] for x in soup.find_all("a") if x["href"].startswith(internal_link_starts_with)]
 
     # results = soup.find(id="rightpanel")
     # print(results.prettify())
@@ -31,4 +35,15 @@ def parse_internal_links(html):
     #     href = x["href"]
 
     #     if href.startswith("/en"):
-    #         return href
+    #         print(href)
+
+
+def fetch_internal_page(link, domain):
+    """when given the link and the domain, this checks if it's valid. returns response.content if valid, None if not"""
+    try:
+        response = requests.get(f"{domain}{link}")
+        response.raise_for_status()
+    except requests.exceptions.HTTPError or requests.exceptions.RequestException:
+        return None
+
+    return response.content
