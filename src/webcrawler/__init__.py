@@ -1,8 +1,11 @@
-seed_urls = ["https://dartmouth.smartcatalogiq.com/en/current/orc/departments-programs-undergraduate/", "https://dartmouth.smartcatalogiq.com/en/current/orc/departments-programs-graduate"]
+seed_urls = ["https://dartmouth.smartcatalogiq.com/en/current/orc/departments-programs-undergraduate/", "https://dartmouth.smartcatalogiq.com/en/current/orc/departments-programs-graduate", "https://dartmouth.smartcatalogiq.com/en/2026s/supplement/new-undergraduate-courses"]
 seed_domain = "https://dartmouth.smartcatalogiq.com"
 internal_marker = "/en"
 
 from .crawler import *
+from .course import *
+
+courses = set() # set with all the course objects in it
 
 def main() -> None:
     print("initiating webcrawl...\n")
@@ -35,9 +38,14 @@ def main() -> None:
         if html is None:
             continue
 
-        print()
-        print(url)
-        print(parse_course(html))
+        
+        courseObject = parse_course(html,url)
+        if courseObject is not None:
+            print("\u2713",url) # showing url, is a course
+            courses.add(courseObject)
+        else:
+            print("\u2718",url) # showing url, but not a course -- i don't want to hear the ai allegations on this unicode character insert! I searched those up to make it easier to read fast in the terminal thank you very much
+
         # getting all the links on this page and adding them to the queue
         links_on_this_page = parse_internal_links(html, internal_marker)
         for link in links_on_this_page:
