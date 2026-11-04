@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import re 
 
 from .course import *
 
@@ -65,21 +66,42 @@ def parse_course(html,url):
         # updating all the html attributes from what we have parsed
         course.prereqs_html = prereqs
         course.degree_attributes_html = degree_attributes
-        course.cross_lists_html = None
         course.coreqs_html = coreqs
         course.offerings_html = offered
         course.description_html = description
         course.instructor_html = instructor
+        
+        # getting the cross listed courses
+        h2 = soup.find("h2", string=re.compile("Cross Listed Courses"))
+        if h2 is not None:
+            cross_lists = []
+            for node in  h2.next_siblings:
+                if node is None:  
+                    continue
+                if getattr(node, "name", None) == "div": # we've gotten to the end of the list (this is just seeing if the next sibling is a div)
+                    break
+                cross_lists.append(node)
+            course.cross_lists_html = cross_lists
+            
+        # getting department specific course categories
+        h3 = soup.find("h3", string=re.compile("Department-Specific Course Categories"))
+        if h3 is not None:
+            categories = []
+            for node in h3.next_siblings:
+                if node is None:
+                    continue
+                if getattr(node, "name", None) == "div":
+                    break
+                categories.append(node.strip())
+            print(categories)
+            course.department_category_html = categories
 
-        print(prereqs)
         return course
-
+        
+            
     return None
 
     
-        
-        
-        
         
 
 

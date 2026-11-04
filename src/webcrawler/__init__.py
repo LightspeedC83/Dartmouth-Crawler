@@ -1,4 +1,8 @@
-seed_urls = ["https://dartmouth.smartcatalogiq.com/en/current/orc/departments-programs-undergraduate/", "https://dartmouth.smartcatalogiq.com/en/current/orc/departments-programs-graduate", "https://dartmouth.smartcatalogiq.com/en/2026s/supplement/new-undergraduate-courses"]
+seed_urls = ["https://dartmouth.smartcatalogiq.com/en/2026s/supplement/new-undergraduate-courses/classics-classical-studies-greek-latin/clst-11-22",
+             "https://dartmouth.smartcatalogiq.com/en/current/orc/departments-programs-undergraduate/engineering-sciences/engs-engineering-sciences-undergraduate",
+             "https://dartmouth.smartcatalogiq.com/en/current/orc/departments-programs-undergraduate/", 
+             "https://dartmouth.smartcatalogiq.com/en/current/orc/departments-programs-graduate",
+             "https://dartmouth.smartcatalogiq.com/en/2026s/supplement/new-undergraduate-courses"]
 seed_domain = "https://dartmouth.smartcatalogiq.com"
 internal_marker = "/en"
 
