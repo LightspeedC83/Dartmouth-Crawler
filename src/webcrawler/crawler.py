@@ -64,12 +64,12 @@ def parse_course(html,url):
     if is_course:  
         course = Course(page_url=url) #creating course object
         # updating all the html attributes from what we have parsed
-        course.prereqs_html = prereqs
-        course.degree_attributes_html = degree_attributes
-        course.coreqs_html = coreqs
-        course.offerings_html = offered
-        course.description_html = description
-        course.instructor_html = instructor
+        course.prereqs_html = [str(x) for x in prereqs]
+        course.degree_attributes_html = [str(x) for x in degree_attributes]
+        course.coreqs_html = [str(x) for x in coreqs]
+        course.offerings_html = [str(x) for x in offered]
+        course.description_html = [str(x) for x in description]
+        course.instructor_html = [str(x) for x in instructor]
         
         # getting the cross listed courses
         h2 = soup.find("h2", string=re.compile("Cross Listed Courses"))
@@ -81,7 +81,7 @@ def parse_course(html,url):
                 if getattr(node, "name", None) == "div": # we've gotten to the end of the list (this is just seeing if the next sibling is a div)
                     break
                 cross_lists.append(node)
-            course.cross_lists_html = cross_lists
+            course.cross_lists_html = [str(x) for x in cross_lists]
             
         # getting department specific course categories
         h3 = soup.find("h3", string=re.compile("Department-Specific Course Categories"))
@@ -93,8 +93,7 @@ def parse_course(html,url):
                 if getattr(node, "name", None) == "div":
                     break
                 categories.append(node.strip())
-            print(categories)
-            course.department_category_html = categories
+            course.department_category_html = [str(x) for x in categories]
 
         return course
         
@@ -102,7 +101,7 @@ def parse_course(html,url):
     return None
 
     
-        
+
 
 
     

@@ -1,3 +1,7 @@
+# ignore any scraped data
+src/data
+
+
 # Python-generated files
 __pycache__/
 *.py[oc]

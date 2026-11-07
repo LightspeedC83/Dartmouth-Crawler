@@ -1,18 +1,36 @@
-seed_urls = ["https://dartmouth.smartcatalogiq.com/en/2026s/supplement/new-undergraduate-courses/classics-classical-studies-greek-latin/clst-11-22",
-             "https://dartmouth.smartcatalogiq.com/en/current/orc/departments-programs-undergraduate/engineering-sciences/engs-engineering-sciences-undergraduate",
+
+from .crawler import *
+from .course import *
+from .data_storage import *
+
+
+seed_urls = ["https://dartmouth.smartcatalogiq.com/en/current/orc/departments-programs-undergraduate/engineering-sciences/engs-engineering-sciences-undergraduate",
              "https://dartmouth.smartcatalogiq.com/en/current/orc/departments-programs-undergraduate/", 
              "https://dartmouth.smartcatalogiq.com/en/current/orc/departments-programs-graduate",
              "https://dartmouth.smartcatalogiq.com/en/2026s/supplement/new-undergraduate-courses"]
 seed_domain = "https://dartmouth.smartcatalogiq.com"
 internal_marker = "/en"
 
-from .crawler import *
-from .course import *
 
-courses = set() # set with all the course objects in it
 
 def main() -> None:
+    print(load_data("./src/data/crawler_data.pkl"))
+    
     print("initiating webcrawl...\n")
+
+    courses = set() # set with all the course objects in it
+    
+    try:
+        crawl(seed_urls, seed_domain, internal_marker, object_storage=courses)
+
+    except KeyboardInterrupt:
+        print("user has interrupted the search")
+
+    # either it goes until it's done or the user stops the search, at the end we store the result
+    save_data("./src/data/crawler_data.pkl", courses, overwrite=True)
+
+
+def crawl(seed_urls,seed_domain, internal_marker, object_storage):
 
     visited_links = {} # each link entry gets marked as visited here True = Visited
     queue = []
@@ -28,7 +46,7 @@ def main() -> None:
             continue
 
         # checking if url needs to be fixed becuase it's internal to the domain
-        url = construct_url(url)
+        url = construct_url(url, seed_domain)
 
         # doing a bounds check to make sure the crawler doesn't go outside of the bounds defined by the seed urls
         if True not in [url.startswith(x) for x in seed_urls]:
@@ -46,21 +64,21 @@ def main() -> None:
         courseObject = parse_course(html,url)
         if courseObject is not None:
             print("\u2713",url) # showing url, is a course
-            courses.add(courseObject)
+            object_storage.add(courseObject)
         else:
             print("\u2718",url) # showing url, but not a course -- i don't want to hear the ai allegations on this unicode character insert! I searched those up to make it easier to read fast in the terminal thank you very much
 
         # getting all the links on this page and adding them to the queue
         links_on_this_page = parse_internal_links(html, internal_marker)
         for link in links_on_this_page:
-            link = construct_url(link)
+            link = construct_url(link, seed_domain)
             if link in visited_links and visited_links[link]: continue # if we've visited this link before skip
                 
             queue.append(link)
         
 
 
-def construct_url(link):
+def construct_url(link, seed_domain):
     """takes a link and returns a valid link in the seed domain, run internal links through here to get consistent searchable links. 
     does nothing to non partial links."""
     # checking if url needs to be fixed becuase it's internal to the domain
