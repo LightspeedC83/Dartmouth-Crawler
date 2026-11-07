@@ -28,8 +28,9 @@ I am also using this as an opportunity to learn how to effectively use uv to man
 - ~~Get the data from the dartmouth catalog~~
 - ~~determine whether or not a page is for a course~~
 - ~~get a bunch of examples by manually combing the catalog~~
-- get the course information html from the page ~~& create object structure~~
-- represent data in a graph
+- ~~get the course information html from the page & create object structure~~
+- extract data from the html 
+- represent data in a graph (networkx)
 - visualize the graph
 
 # other ideas
@@ -39,6 +40,8 @@ I am also using this as an opportunity to learn how to effectively use uv to man
 
 
 # HTML examples
+The first thing I did was look through the site I wanted to scrape. I used inspect element to get a bunch of examples of the html for different parts of the page I was interested in.  I've collected those examples below:
+
 ## sc_prereqs
 ```html
 <div class="sc_prereqs">

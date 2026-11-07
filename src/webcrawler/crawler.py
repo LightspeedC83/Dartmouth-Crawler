@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 import re 
+from rich.console import Console 
+from rich.progress import Progress
 
 from .course import *
 
@@ -40,6 +42,81 @@ def parse_internal_links(html, internal_link_starts_with):
     #         print(href)
 
 
+
+def construct_url(link, seed_domain, internal_marker):
+    """takes a link and returns a valid link in the seed domain, run internal links through here to get consistent searchable links. 
+    does nothing to non partial links."""
+    # checking if url needs to be fixed becuase it's internal to the domain
+    if link.startswith(internal_marker): # this means the link is internal
+        link = f"{seed_domain}{link}"
+
+    return link
+   
+    
+
+
+def crawl(seed_urls,seed_domain, internal_marker, object_storage):
+    """This function crawls all the links starting from a list of seed urls, staying within the seed domain. 
+    The internal marker is what a link would start with if it is a subdomain link. 
+    This function calls parse course on each url and adds the course object to the given object_storage set"""
+    visited_links = {} # each link entry gets marked as visited here True = Visited
+    queue = []
+    for url in seed_urls:
+        visited_links[url] = False
+        queue.append(url)
+
+    with Progress() as progress:    # setting up the progress indicator bar
+        crawl_task = progress.add_task("[bold dark_green]Crawling... 0 Courses Found, 0 Sites Visited", total=len(queue))
+              
+
+        sites_visited = 0
+        num_courses_found = 0
+        while len(queue)>0:
+            url = queue.pop(0)
+            progress.update(crawl_task, total=len(queue))
+            
+            if url in visited_links and visited_links[url]: # if we've visited this link before
+                continue
+
+            # checking if url needs to be fixed becuase it's internal to the domain
+            url = construct_url(url, seed_domain, internal_marker)
+
+            # doing a bounds check to make sure the crawler doesn't go outside of the bounds defined by the seed urls
+            if True not in [url.startswith(x) for x in seed_urls]:
+                continue
+
+            # if we make it this far, we will load the html from the page, we take note of that
+            sites_visited+=1
+            progress.update(crawl_task, advance=1, description=f"[bold dark_green]crawling... {num_courses_found} Courses Found. {sites_visited} Sites Visited. {len(queue)} Sites Left in Queue.  ")
+            
+            html = fetch_page(url) # getting the html from the page
+            
+            # mark link visited
+            visited_links[url] = True
+            if html is None:
+                continue
+
+            
+            courseObject = parse_course(html,url)
+            if courseObject is not None: # if page is a course page
+                print("\u2713",url) # showing url, is a course
+                object_storage.add(courseObject)
+                num_courses_found+=1
+                
+            else:
+                print("\u2718",url) # showing url, but not a course -- i don't want to hear the ai allegations on this unicode character insert! I searched those up to make it easier to read fast in the terminal thank you very much
+
+            # getting all the links on this page and adding them to the queue
+            links_on_this_page = parse_internal_links(html, internal_marker)
+            for link in links_on_this_page:
+                link = construct_url(link, seed_domain, internal_marker)
+                if link in visited_links and visited_links[link]: continue # if we've visited this link before skip
+                    
+                queue.append(link)
+        progress.update(crawl_task, completed=True)
+
+    print("\nWebcrawl finished!")
+        
 
 
 
