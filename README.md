@@ -38,6 +38,12 @@ I am also using this as an opportunity to learn how to effectively use uv to man
     - hook this up to an llm to find ones that fit you and and then 
 
 
+# Things I learned on this project
+- how to use uv
+- webcrawling and webscraping with requests and beatifulsoup
+- using rich to make the terminal look better
+- pickling 
+
 
 # HTML examples
 The first thing I did was look through the site I wanted to scrape. I used inspect element to get a bunch of examples of the html for different parts of the page I was interested in.  I've collected those examples below:

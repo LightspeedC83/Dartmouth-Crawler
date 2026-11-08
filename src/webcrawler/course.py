@@ -22,12 +22,29 @@ class Course():
         self.cross_lists = None
         self.coreqs = None
         self.offerings = None
+        # not having a processed description, we can just render the html if we want to visualize it
+        self.instructor = None
+        self.department_category = None # will be a string
 
-    
+
+    def process_all_data(self):
+        """this method processes all the html data into useful object properties"""
+
+        self.process_prereqs_data()
+        self.process_degree_attributes_data()
+        self.process_cross_lists_data()
+        self.process_coreqs_data()
+        self.process_offerings_data()
+        self.process_instructor()
+        self.process_department_category()
+
+        
     def process_prereqs_data(self):
         """This method parses the prereqs_htm class parameter and uses its data to update the prereqs parameter, which should be directly accessible\n
         The prereqs data is usually in a buch of `<a>` tags it seems. oftentimes, they have a href link on the rereq """
-        if len(self.prereqs_html) == 0: return False
+        if self.prereqs_html is None or len(self.prereqs_html) == 0:
+                return False
+
         # TODO: custom body to process the html
 
         pass
@@ -35,7 +52,9 @@ class Course():
     
     def process_degree_attributes_data(self):
         """This method parses the degree_attr class parameter and uses its data to update the degree_attributes parameter, which should be directly accessible"""
-        if len(self.degree_attributes_html) == 0: return False
+        if self.degree_attributes_html is None or len(self.degree_attributes_html) == 0:
+                return False
+
         # TODO: custom body to process the html
 
         pass
@@ -43,7 +62,9 @@ class Course():
     
     def process_cross_lists_data(self):
         """This method parses the cross_lists class parameter and uses its data to update the cross_lists parameter, which should be directly accessible"""
-        if len(self.cross_lists_html) == 0: return False
+        if self.cross_lists_html is None or len(self.cross_lists_html) == 0:
+            return False
+
         # TODO: custom body to process the html
 
         pass
@@ -51,15 +72,56 @@ class Course():
     
     def process_coreqs_data(self):
         """This method parses the coreqs_html class parameter and uses its data to update the coreqs parameter, which should be directly accessible"""
-        if len(self.coreqs_html) == 0: return False
+        if self.coreqs_html is None or len(self.coreqs_html) == 0:
+            return False
+
         # TODO: custom body to process the html
 
         pass
 
     
     def process_offerings_data(self):    
-        """This method parses the offerings_h class parameter and uses its data to update the offerings parameter, which should be directly accessible"""
-        if len(self.offerings_html) == 0: return False
+        """This method parses the offerings_html class parameter and uses its data to update the offerings parameter, which should be directly accessible"""
+        if self.offerings_html is None or len(self.offerings_html) == 0:
+            return False
+
         # TODO: custom body to process the html
 
         pass
+
+    def process_instructor(self):
+        """This method parses the instructor_html class parameter and uses its data to update the coreqs parameter, which should be directly accessible"""
+        if self.instructor_html is None or len(self.instructor_html) == 0:
+            return False
+
+        #TODO: custom body to process everything
+
+        pass
+
+
+    def process_department_category(self):
+        """This method parses the department_category_html class parameter and uses its data to update the coreqs parameter, which should be directly accessible"""
+        if self.department_category_html is None or len(self.department_category_html) == 0:
+            return False
+
+        # the list we get loaded in with will always be length 1, we now need to split this up...
+        # ...the thing is that, it's always one thing and if it splits up, it does so based on class year.
+        # meaning if we split, we can separate by class year, but it might look like there are multiple department course categories,
+        # but actually it's one department course category that changed over time. I'll include code to split up here, but commented out
+        # 
+        # but there can be multiple department course categories, which are separated by a comma after the word class of XXXX and beyond/before, which usually has a ";" separator (i found one case where it had this sturcture but no ";" separator: 'Class of 2024 and Beyond Major/Minor Dist: US, modern.').
+        #  commas appear elsewhere, but it seems if they do they're part of a sentence and have no significance. 
+        # 
+        # output_list =self.department_category_html 
+        # if ";" in  output_list[0]:
+        #     output_list = output_list[0].split(";")      
+        # self.department_category = output_list
+
+        self.department_category = self.department_category_html[0]
+        # print(self.department_category)
+        return True
+        
+        
+
+        
+

@@ -6,9 +6,12 @@ from .data_storage import *
 
 
 def main() -> None:
-    # print(len(load_data("./src/data/crawler_data_full_sweep_11.7.26.pkl")))
+    
+    clean_course_html(load_filepath="./src/data/crawler_data_full_sweep_11.7.26.pkl", save_filepath="./src/data/processed_data_full_sweep.pkl")
 
-    crawl_dartmouth_courses("./src/data/crawler_data.pkl")
+    # clean_course_html(load_filepath="./src/data/crawler_data.pkl", save_filepath="./src/data/processed_data_full_sweep.pkl")
+
+    # crawl_dartmouth_courses("./src/data/crawler_data.pkl")
 
 
 def crawl_dartmouth_courses(save_filepath):
@@ -36,3 +39,21 @@ def crawl_dartmouth_courses(save_filepath):
     # either it goes until it's done or the user stops the search, at the end we store the result
     save_data(save_filepath, courses, overwrite=True)
 
+
+def clean_course_html(load_filepath, save_filepath):
+    """loads in dartmouth courses from a pickled file, cleans the html"""
+    
+    print(f"loading {load_filepath}")
+    
+    try:
+        course_set = load_data(load_filepath) # load in from pickle
+    except FileNotFoundError as e:
+        print(f"File was Not able to be located: \n{e}")
+
+    # call object methods to clean the html
+    for course in course_set:
+        # course.process_all_data()
+        course.process_department_category()
+
+    save_data(save_filepath, course_set, overwrite=True)
+    
