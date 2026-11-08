@@ -1,4 +1,4 @@
-
+from bs4 import BeautifulSoup
 
 class Course(): 
 
@@ -85,17 +85,24 @@ class Course():
         if self.offerings_html is None or len(self.offerings_html) == 0:
             return False
 
-        # TODO: custom body to process the html
+        # currently all offerings lists are 1 element long (or empty)
+        self.offerings = []
 
-        pass
+        soup = BeautifulSoup(self.offerings_html[0], "html.parser")
+        terms_html = soup.find_all("li")
+        for x in terms_html:
+            self.offerings.append(x.text)
+
+        return True
+
 
     def process_instructor(self):
         """This method parses the instructor_html class parameter and uses its data to update the coreqs parameter, which should be directly accessible"""
         if self.instructor_html is None or len(self.instructor_html) == 0:
             return False
 
-        #TODO: custom body to process everything
-
+        #TODO: custom body to process everything. -- currently we're having a problem where the instructor data isn't actually making it into the course objects, rather just empty lists []
+        
         pass
 
 

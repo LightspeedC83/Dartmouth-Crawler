@@ -29,6 +29,7 @@ I am also using this as an opportunity to learn how to effectively use uv to man
 - ~~determine whether or not a page is for a course~~
 - ~~get a bunch of examples by manually combing the catalog~~
 - ~~get the course information html from the page & create object structure~~
+	- fix issue with instructor data not making it into the course object
 - extract data from the html 
 - represent data in a graph (networkx)
 - visualize the graph

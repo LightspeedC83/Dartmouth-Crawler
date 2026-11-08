@@ -53,7 +53,9 @@ def clean_course_html(load_filepath, save_filepath):
     # call object methods to clean the html
     for course in course_set:
         # course.process_all_data()
-        course.process_department_category()
+        # course.process_department_category()
+        # course.process_instructor()
+        course.process_offerings_data()
 
     save_data(save_filepath, course_set, overwrite=True)
     
