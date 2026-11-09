@@ -6,12 +6,12 @@ from .data_storage import *
 
 
 def main() -> None:
-    
-    clean_course_html(load_filepath="./src/data/crawler_data_full_sweep_11.7.26.pkl", save_filepath="./src/data/processed_data_full_sweep.pkl")
 
-    # clean_course_html(load_filepath="./src/data/crawler_data.pkl", save_filepath="./src/data/processed_data_full_sweep.pkl")
+    clean_course_html(load_filepath="./src/data/crawler_data_full_sweep_11.9.26.pkl", save_filepath="./src/data/processed_data_full_sweep.pkl")
 
-    # crawl_dartmouth_courses("./src/data/crawler_data.pkl")
+    # clean_course_html(load_filepath="./src/data/crawler_data_1.pkl", save_filepath="./src/data/processed_data_full_sweep.pkl")
+
+    # crawl_dartmouth_courses("./src/data/crawler_data_1.pkl")
 
 
 def crawl_dartmouth_courses(save_filepath):
@@ -54,8 +54,10 @@ def clean_course_html(load_filepath, save_filepath):
     for course in course_set:
         # course.process_all_data()
         # course.process_department_category()
-        # course.process_instructor()
-        course.process_offerings_data()
+        print(course.page_url)
+        course.process_instructor()
+        # course.process_offerings_data()
+        # course.process_cross_lists_data()
 
     save_data(save_filepath, course_set, overwrite=True)
     

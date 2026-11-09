@@ -33,7 +33,7 @@ class Course():
         self.process_prereqs_data()
         self.process_degree_attributes_data()
         self.process_cross_lists_data()
-        self.process_coreqs_data()
+        # self.process_coreqs_data()
         self.process_offerings_data()
         self.process_instructor()
         self.process_department_category()
@@ -66,18 +66,39 @@ class Course():
             return False
 
         # TODO: custom body to process the html
+        output_list = [x.strip(",").strip(";").strip() for x in self.cross_lists_html if x.strip() not in [",",";",""]]
+        self.cross_lists = []
+        for item in output_list:
+            soup = BeautifulSoup(item, "html.parser")   
+            if soup.find("a", href=True):
+                x=soup.find_all("a", href=True)
+                self.cross_lists.append(x[0].text)
+            else:
+                self.cross_lists.append(item.text)                
 
+        for x in self.cross_lists:
+            print(x)
+        print()
+
+        # if len(self.cross_lists_html)>1:
+        #     print()
+        #     print(self.cross_lists_html)
+        #     print('\t',"-----begin--------")
+        #     for x in (self.cross_lists_html):
+        #         if x.strip() not in [",", ";",""] :
+        #             print('\t',x.strip(",").strip(";").strip())
+        #     print('\t',"------end--------")
+        
         pass
 
     
-    def process_coreqs_data(self):
-        """This method parses the coreqs_html class parameter and uses its data to update the coreqs parameter, which should be directly accessible"""
-        if self.coreqs_html is None or len(self.coreqs_html) == 0:
-            return False
+    # def process_coreqs_data(self):
+    #     """This method parses the coreqs_html class parameter and uses its data to update the coreqs parameter, which should be directly accessible"""
+    #     if self.coreqs_html is None or len(self.coreqs_html) == 0:
+    #         return False
 
-        # TODO: custom body to process the html
-
-        pass
+    #     # There are no coreqs data, seems like it's not a thing. They're all empty (if they're all empty why is there a section for them on the registrar sites??)
+    #     pass
 
     
     def process_offerings_data(self):    
@@ -101,8 +122,12 @@ class Course():
         if self.instructor_html is None or len(self.instructor_html) == 0:
             return False
 
-        #TODO: custom body to process everything. -- currently we're having a problem where the instructor data isn't actually making it into the course objects, rather just empty lists []
-        
+        # TODO: make sure we're not misssing anything
+        soup = BeautifulSoup(self.instructor_html[0], "html.parser")
+        instructor = soup.find("div", id="instructor").text[10:]
+
+        print(instructor)
+
         pass
 
 

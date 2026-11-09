@@ -1,9 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 import re 
-from rich.console import Console 
 from rich.progress import Progress
-
+from collections import deque
 from .course import *
 
 # we will use a user agent header to make our request to the website look like a normal user and not a bot
@@ -60,7 +59,8 @@ def crawl(seed_urls,seed_domain, internal_marker, object_storage):
     The internal marker is what a link would start with if it is a subdomain link. 
     This function calls parse course on each url and adds the course object to the given object_storage set"""
     visited_links = {} # each link entry gets marked as visited here True = Visited
-    queue = []
+    seen_links = set(seed_urls)
+    queue = deque()
     for url in seed_urls:
         visited_links[url] = False
         queue.append(url)
@@ -72,8 +72,8 @@ def crawl(seed_urls,seed_domain, internal_marker, object_storage):
         sites_visited = 0
         num_courses_found = 0
         while len(queue)>0:
-            url = queue.pop(0)
-            progress.update(crawl_task, total=len(queue))
+            url = queue.popleft()
+            progress.update(crawl_task, total=len(seen_links), completed=sites_visited)
             
             if url in visited_links and visited_links[url]: # if we've visited this link before
                 continue
@@ -110,8 +110,10 @@ def crawl(seed_urls,seed_domain, internal_marker, object_storage):
             links_on_this_page = parse_internal_links(html, internal_marker)
             for link in links_on_this_page:
                 link = construct_url(link, seed_domain, internal_marker)
-                if link in visited_links and visited_links[link]: continue # if we've visited this link before skip
-                    
+                if link in visited_links and visited_links[link] or link in seen_links: continue # if we've visited this link before skip
+                if not link.startswith(tuple(seed_urls)): continue # if the link is out of bounds, we skip 
+                
+                seen_links.add(link)
                 queue.append(link)
         progress.update(crawl_task, completed=True)
 
@@ -134,7 +136,7 @@ def parse_course(html,url):
 
     offered = soup.find_all("div", class_="offered")
     description = soup.find_all("div", class_="desc")
-    instructor = soup.find_all("div", class_="instructor")
+    instructor = soup.find_all("div", id="instructor")
 
     is_course = True in [len(x)>0 for x in [degree_attributes, prereqs, coreqs, timetable]] # a page is a course if the page has any of these things...
 
