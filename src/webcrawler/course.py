@@ -64,34 +64,39 @@ class Course():
         """This method parses the cross_lists class parameter and uses its data to update the cross_lists parameter, which should be directly accessible"""
         if self.cross_lists_html is None or len(self.cross_lists_html) == 0:
             return False
-
-        # TODO: custom body to process the html
+        
+        # TODO: Some cross lists that are multiple classes in one string need to be separated (eg. "ARAB 61.10 COLT 62.10 MES 16.08")
         output_list = [x.strip(",").strip(";").strip() for x in self.cross_lists_html if x.strip() not in [",",";",""]]
         self.cross_lists = []
         for item in output_list:
-            soup = BeautifulSoup(item, "html.parser")   
-            if soup.find("a", href=True):
-                x=soup.find_all("a", href=True)
-                self.cross_lists.append(x[0].text)
+            soup = BeautifulSoup(item, "html.parser")
+            to_add = item   
+
+            if soup.find("a", href=True): # if our element is acutally a link to another course, we replace it with the string text name for said course
+                x=soup.find_all("a", href=True)[0].text
+                to_add = x
+
+            split = to_add.strip().split(" ")
+            if len(split) > 2: # a normal class would have [character sequence] [space] [number sequence], which results in a lenght of two when split by space
+                list_to_add = []
+                prev_component = None
+                for component in to_add.strip().split(" "):
+                    if prev_component != None:
+                        course_name = prev_component + " " + component
+                        list_to_add.append(course_name.strip().strip(";").strip(","))
+                        prev_component = None
+                    else:
+                        prev_component = component
+
+                self.cross_lists += list_to_add # add each new class name item to the cross list list
+
             else:
-                self.cross_lists.append(item.text)                
+                self.cross_lists.append(to_add.strip().strip(";").strip(","))  
+            
 
-        for x in self.cross_lists:
-            print(x)
-        print()
+        return True
 
-        # if len(self.cross_lists_html)>1:
-        #     print()
-        #     print(self.cross_lists_html)
-        #     print('\t',"-----begin--------")
-        #     for x in (self.cross_lists_html):
-        #         if x.strip() not in [",", ";",""] :
-        #             print('\t',x.strip(",").strip(";").strip())
-        #     print('\t',"------end--------")
         
-        pass
-
-    
     # def process_coreqs_data(self):
     #     """This method parses the coreqs_html class parameter and uses its data to update the coreqs parameter, which should be directly accessible"""
     #     if self.coreqs_html is None or len(self.coreqs_html) == 0:

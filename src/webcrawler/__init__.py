@@ -52,12 +52,12 @@ def clean_course_html(load_filepath, save_filepath):
 
     # call object methods to clean the html
     for course in course_set:
+        # print(course.page_url)
         # course.process_all_data()
         # course.process_department_category()
-        print(course.page_url)
-        course.process_instructor()
+        # course.process_instructor()
         # course.process_offerings_data()
-        # course.process_cross_lists_data()
+        course.process_cross_lists_data()
 
     save_data(save_filepath, course_set, overwrite=True)
     
