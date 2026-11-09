@@ -57,7 +57,8 @@ def clean_course_html(load_filepath, save_filepath):
         # course.process_department_category()
         # course.process_instructor()
         # course.process_offerings_data()
-        course.process_cross_lists_data()
+        # course.process_cross_lists_data()
+        course.process_degree_attributes_data()
 
     save_data(save_filepath, course_set, overwrite=True)
     

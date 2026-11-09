@@ -19,6 +19,9 @@ class Course():
         # these will be the informations once extracted from each _html parameter
         self.prereqs = None
         self.degree_attributes = None
+        self.distributive_attribute = None # these three are subsets of self.degree_attributes
+        self.world_culture_attribute = None # these three are subsets of self.degree_attributes
+        self.language_attribute = None # these three are subsets of self.degree_attributes
         self.cross_lists = None
         self.coreqs = None
         self.offerings = None
@@ -55,9 +58,36 @@ class Course():
         if self.degree_attributes_html is None or len(self.degree_attributes_html) == 0:
                 return False
 
-        # TODO: custom body to process the html
+        #making sure these exist and are set to None first -- TODO: get rid of this after doing a full sweep with new object structure
+        self.distributive_attribute = None 
+        self.world_culture_attribute = None 
+        self.language_attribute = None 
 
-        pass
+        soup = BeautifulSoup(self.degree_attributes_html[0], "html.parser")
+        self.degree_attributes = soup.find("p").text
+        
+        # print(self.page_url)
+        self.distributive_attribute = []
+        for attribute in self.degree_attributes.split(";"):
+            attribute = attribute.strip()
+            # if "dist"in attribute.lower():
+            #     print(attribute)
+            #     pass
+            if "wcult" in attribute.lower():
+                self.world_culture_attribute = attribute[6:].strip()
+                
+            elif "lang" in attribute.lower():
+                self.language_attribute = attribute[5:].strip()
+            elif attribute.strip().lower()=="w": # there's literally one course page (COLT 19) where the world culture attribute is out of place so I have to catch it here lol  
+                self.world_culture_attribute = attribute.strip()
+            else: #  everything else is a distrib
+                self.distributive_attribute += [x.strip().strip(".") for x in attribute[5:].split("or")]
+                
+        if len(self.distributive_attribute) == 0 or self.distributive_attribute[0]=='': # if there is no distributive attribute list, we write back None
+            self.distributive_attribute = None
+
+        return True
+        
 
     
     def process_cross_lists_data(self):
