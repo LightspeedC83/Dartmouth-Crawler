@@ -1,10 +1,12 @@
 from bs4 import BeautifulSoup
+import re 
 
 class Course(): 
 
-    def __init__(self, page_url=""):
+    def __init__(self, page_url="", course_name=None):
 
         self.page_url = page_url
+        self.course_name = course_name # the name of the course consisting of the department code and a sequence of numbers
 
         # the html from the website that we get for the courses
         self.prereqs_html = None 
@@ -18,6 +20,7 @@ class Course():
 
         # these will be the informations once extracted from each _html parameter
         self.prereqs = None
+        self.instructor_peermission_option = False # when this is true, the prerequisite description suggests that instructor permission can be an option to work around prereqs 
         self.degree_attributes = None
         self.distributive_attribute = None # these three are subsets of self.degree_attributes
         self.world_culture_attribute = None # these three are subsets of self.degree_attributes
@@ -48,9 +51,44 @@ class Course():
         if self.prereqs_html is None or len(self.prereqs_html) == 0:
                 return False
 
-        # TODO: custom body to process the html
 
-        pass
+        soup = BeautifulSoup(self.prereqs_html[0],"html.parser")
+        x = soup.find("div", class_="sc_prereqs")
+        
+        if x .text == "\n": # no prerequisites
+            self.prereqs = None
+        else:
+            #TODO: extract the prereq information
+            h2 = soup.find("h2", string=re.compile("Prerequisite") )
+            if h2 is not None:
+                prereqs = []
+                for node in  h2.next_siblings:
+                    if node is None:  
+                        continue
+                    if getattr(node, "name", None) == "div": # we've gotten to the end of the list (this is just seeing if the next sibling is a div)
+                        break
+
+                    subsoup = BeautifulSoup(str(node), "html.parser")
+                    href =  subsoup.find("a", href=True)
+                    if href is not None: # if it's a link to another course page
+                        prereqs.append(href.text.strip())
+                    else: 
+                        if "instructor" in node.text.lower() or "permission" in node.text.lower():
+                            self.instructor_peermission_option = True
+
+                        if node.strip() != '':
+                            prereqs.append(node.strip())
+                        
+
+                self.prereqs = prereqs
+
+            # print(self.page_url)
+            # print(x.prettify())
+            print(self.prereqs)
+            print("\n")
+
+             
+            pass
 
     
     def process_degree_attributes_data(self):
