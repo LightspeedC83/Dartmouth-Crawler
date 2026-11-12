@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import re 
+from . import prereq_parser
 
 class Course(): 
 
@@ -19,12 +20,15 @@ class Course():
         self.department_category_html = None # these are the only two without a div
 
         # these will be the informations once extracted from each _html parameter
-        self.prereqs = None
+        self.prereqs = None # this is a list of lists, each element of the list is a list of courses that all could satisfy one of the prerequisite seats -- eg. [[COSC 10, ENGS 20], [ENGS 22]] would mean that to take the course you need both ENGS 22 and (either CS10 or ENGS 20)
         self.instructor_peermission_option = False # when this is true, the prerequisite description suggests that instructor permission can be an option to work around prereqs 
+        self.prereq_notes = None
+
         self.degree_attributes = None
         self.distributive_attribute = None # these three are subsets of self.degree_attributes
         self.world_culture_attribute = None # these three are subsets of self.degree_attributes
         self.language_attribute = None # these three are subsets of self.degree_attributes
+
         self.cross_lists = None
         self.coreqs = None
         self.offerings = None
@@ -80,15 +84,12 @@ class Course():
                             prereqs.append(node.strip())
                         
 
-                self.prereqs = prereqs
+                self.prereqs, self.prereq_notes = prereq_parser.parse_prereqs(prereqs)
+                
 
             # print(self.page_url)
-            # print(x.prettify())
-            print(self.prereqs)
-            print("\n")
+            print(self.prereqs, self.prereq_notes)
 
-             
-            pass
 
     
     def process_degree_attributes_data(self):
